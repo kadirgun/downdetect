@@ -29,7 +29,6 @@ jobs:
         with:
           url: https://example.com
           expected-status-codes: 200,201
-          #unexpected-status-codes: 404,500
           expected-response-time: 1000
           discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
 ```
