@@ -2,6 +2,18 @@ name: Test Action
 
 on:
   workflow_dispatch:
+    inputs:
+      url:
+        description: 'URL to ping'
+        required: true
+        default: 'https://www.google.com'
+      expected-status-codes:
+        description: 'Expected status codes'
+        required: true
+        default: '200,201'
+      discord-webhook:
+        description: 'Discord Webhook URL'
+        required: true
 
 permissions:
   actions: read
@@ -17,6 +29,7 @@ jobs:
         id: ping
         uses: kadirgun/downdetect@main
         with:
-          url: 'https://www.google.com'
-          expected-status-codes: 200,201
-          discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          url: ${{ github.event.inputs.url }}
+          expected-status-codes:
+            ${{ github.event.inputs.expected-status-codes }}
+          discord-webhook: ${{ github.event.inputs.discord-webhook }}
