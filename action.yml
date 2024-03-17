@@ -1,8 +1,9 @@
 name: Down Detector
 description: Detect if a website is down
 author: Kadir Gün
-icon: alert-octagon
-color: red
+branding:
+  icon: alert-octagon
+  color: red
 
 inputs:
   url:
