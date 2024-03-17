@@ -1,0 +1,22 @@
+name: Test Action
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  say-hello:
+    name: Detect Down
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping URL
+        id: ping
+        uses: kadirgun/downdetect@main
+        with:
+          url: 'https://www.google.com'
+          expected-status-codes: 200,201
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
