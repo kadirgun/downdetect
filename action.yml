@@ -1,18 +1,28 @@
-name: Hello, World!
-description: Greet someone and record the time
-author: GitHub Actions
+name: Down Detector
+description: Detect if a website is down
+author: Kadir Gün
 
-# Define your inputs here.
 inputs:
-  who-to-greet:
-    description: Who to greet
+  url:
+    description: The URL to check
     required: true
-    default: World
+  expected-status-codes:
+    description: The expected status codes
+    required: false
+    default: 200
+  expected-response-time:
+    description: The expected response time in milliseconds
+    required: false
+    default: 3000
+  discord-webhook:
+    description: The Discord webhook URL
+    required: false
 
-# Define your outputs here.
 outputs:
-  time:
-    description: The time we greeted you
+  response-time:
+    description: The response time in milliseconds of the request
+  status-code:
+    description: The status code of the response
 
 runs:
   using: node20

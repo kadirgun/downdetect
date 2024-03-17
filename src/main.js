@@ -1,5 +1,7 @@
 const core = require('@actions/core')
 const github = require('@actions/github')
+const { EmbedBuilder } = require('discord.js')
+const { WebhookClient } = require('discord.js')
 
 /**
  * The main function for the action.
@@ -23,6 +25,64 @@ async function run() {
     // Fail the workflow step if an error occurs
     core.setFailed(error.message)
   }
+}
+
+/**
+ * Ping the server to check if it is up.
+ * @returns {Promise<void>} Resolves when the server is up.
+ */
+async function ping() {
+  const url = core.getInput('url', { required: true })
+  const expectedStatusCodes = core
+    .getInput('expected-status-codes', {
+      trimWhitespace: true
+    })
+    .split(',')
+    .map(Number)
+
+  const expectedResponseTime = core.getInput('expected-response-time')
+
+  core.info(`Pinging ${url}...`)
+  const start = Date.now()
+  const response = await fetch(url)
+  if (!expectedStatusCodes.includes(response.status)) {
+    sendErrorToDiscord(
+      `The server at ${url} returned a status code of ${response.status}.`
+    )
+  }
+
+  const responseTime = Date.now() - start
+
+  if (responseTime > expectedResponseTime) {
+    sendErrorToDiscord(
+      `The server at ${url} took ${responseTime}ms to respond, which is longer than the expected ${expectedResponseTime}ms.`
+    )
+  }
+}
+
+/**
+ * Send an error message to Discord.
+ * @param {string} error
+ */
+async function sendErrorToDiscord(error) {
+  const url = core.getInput('discord-webhook-url')
+
+  // If the URL is not set, fail the action to prevent silent failures
+  if (!url) {
+    core.setFailed(error)
+    return
+  }
+
+  const webhookClient = new WebhookClient({ url })
+
+  const embed = new EmbedBuilder()
+  embed.setTitle('Website Down')
+  embed.setColor(0xda3633)
+  embed.setDescription(error)
+
+  webhookClient.send({
+    embeds: [embed]
+  })
 }
 
 module.exports = {

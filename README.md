@@ -1,73 +1,49 @@
-# Hello, World! JavaScript Action
+# Down Detector Action
 
-[![GitHub Super-Linter](https://github.com/actions/hello-world-javascript-action/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
-![CI](https://github.com/actions/hello-world-javascript-action/actions/workflows/ci.yml/badge.svg)
+[![GitHub Super-Linter](https://github.com/kadirgun/downdetect/actions/workflows/linter.yml/badge.svg)](https://github.com/super-linter/super-linter)
+![CI](https://github.com/kadirgun/downdetect/actions/workflows/ci.yml/badge.svg)
 
-This action prints `Hello, World!` or `Hello, <who-to-greet>!` to the log. To
-learn how this action was built, see
-[Creating a JavaScript action](https://docs.github.com/en/actions/creating-actions/creating-a-javascript-action).
-
-## Create Your Own Action
-
-To create your own action, you can use this repository as a template! Just
-follow the below instructions:
-
-1. Click the **Use this template** button at the top of the repository
-1. Select **Create a new repository**
-1. Select an owner and name for your new repository
-1. Click **Create repository**
-1. Clone your new repository
-
-> [!CAUTION]
->
-> Make sure to remove or update the [`CODEOWNERS`](./CODEOWNERS) file! For
-> details on how to use this file, see
-> [About code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
+This GitHub Action periodically sends HTTP requests to a specified URL to detect crashes and notifies you through a [Discord webhook](https://discord.com/developers/docs/resources/webhook).
 
 ## Usage
 
 Here's an example of how to use this action in a workflow file:
 
 ```yaml
-name: Example Workflow
+name: Down Detector
 
 on:
-  workflow_dispatch:
-    inputs:
-      who-to-greet:
-        description: Who to greet in the log
-        required: true
-        default: 'World'
-        type: string
+  schedule:
+    - cron: '*/5 * * * *'
 
 jobs:
-  say-hello:
-    name: Say Hello
+  detect:
+    name: Check if the website is down
     runs-on: ubuntu-latest
 
     steps:
-      # Change @main to a specific commit SHA or version tag, e.g.:
-      # actions/hello-world-javascript-action@e76147da8e5c81eaf017dede5645551d4b94427b
-      # actions/hello-world-javascript-action@v1.2.3
-      - name: Print to Log
-        id: print-to-log
-        uses: actions/hello-world-javascript-action@main
+      - name: Ping the website
+        uses: kadirgun/downdetect@main
         with:
-          who-to-greet: ${{ inputs.who-to-greet }}
+          url: https://example.com
+          expected-status-codes: 200,201
+          #unexpected-status-codes: 404,500
+          expected-response-time: 1000
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
 ```
-
-For example workflow runs, check out the
-[Actions tab](https://github.com/actions/hello-world-javascript-action/actions)!
-:rocket:
 
 ## Inputs
 
 | Input          | Default | Description                     |
 | -------------- | ------- | ------------------------------- |
-| `who-to-greet` | `World` | The name of the person to greet |
+| `expected-status-codes` | 200 | The status code that the website is expected to return. |
+| `unexpected-status-codes` |  | The status code that the website is not expected to return. |
+| `expected-response-time` | 3000 | The expected response time in milliseconds. |
+| `discord-webhook` |  | The Discord webhook URL to send notifications to. |
 
 ## Outputs
 
 | Output | Description             |
 | ------ | ----------------------- |
-| `time` | The time we greeted you |
+| `response-time` | The status code returned by the website. |
+| `status-code` | The response time of the website. |
