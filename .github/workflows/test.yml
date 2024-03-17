@@ -13,7 +13,6 @@ on:
         default: '200,201'
       discord-webhook:
         description: 'Discord Webhook URL'
-        required: true
 
 permissions:
   actions: read
