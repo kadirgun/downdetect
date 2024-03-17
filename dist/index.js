@@ -109910,6 +109910,10 @@ async function run() {
     } catch {
       core.setFailed(message)
     }
+  } else {
+    core.info(`The server at ${url} is up and running.`)
+    core.info(`Status code: ${response.status}`)
+    core.info(`Response time: ${responseTime}ms`)
   }
 }
 
