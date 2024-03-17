@@ -10,10 +10,9 @@
 name: Check Transpiled JavaScript
 
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
 
 permissions:
   contents: read

@@ -2,13 +2,11 @@ name: Continuous Integration
 
 on:
   pull_request:
-  push:
     branches:
       - main
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   test-javascript:
