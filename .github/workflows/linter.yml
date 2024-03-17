@@ -22,9 +22,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install PNPM
+        uses: pnpm/action-setup@v3
+
       - name: Setup Node.js
         id: setup-node
-        uses: actions/setup-node@v4.0.2
+        uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: pnpm
