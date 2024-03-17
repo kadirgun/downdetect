@@ -109872,38 +109872,13 @@ function socketOnError() {
 
 const core = __nccwpck_require__(19093)
 const github = __nccwpck_require__(75942)
-const { EmbedBuilder } = __nccwpck_require__(58169)
-const { WebhookClient } = __nccwpck_require__(58169)
+const { EmbedBuilder, WebhookClient } = __nccwpck_require__(58169)
 
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
-  try {
-    // The `who-to-greet` input is defined in action metadata file
-    const whoToGreet = core.getInput('who-to-greet', { required: true })
-    core.info(`Hello, ${whoToGreet}!`)
-
-    // Get the current time and set as an output
-    const time = new Date().toTimeString()
-    core.setOutput('time', time)
-
-    // Output the payload for debugging
-    core.info(
-      `The event payload: ${JSON.stringify(github.context.payload, null, 2)}`
-    )
-  } catch (error) {
-    // Fail the workflow step if an error occurs
-    core.setFailed(error.message)
-  }
-}
-
-/**
- * Ping the server to check if it is up.
- * @returns {Promise<void>} Resolves when the server is up.
- */
-async function ping() {
   const url = core.getInput('url', { required: true })
   const expectedStatusCodes = core
     .getInput('expected-status-codes', {
@@ -109917,18 +109892,24 @@ async function ping() {
   core.info(`Pinging ${url}...`)
   const start = Date.now()
   const response = await fetch(url)
+  const responseTime = Date.now() - start
+  core.setOutput('status-code', response.status)
+  core.setOutput('response-time', responseTime)
+
+  let message = null
+
   if (!expectedStatusCodes.includes(response.status)) {
-    sendErrorToDiscord(
-      `The server at ${url} returned a status code of ${response.status}.`
-    )
+    message = `The server at ${url} returned a status code of ${response.status}.`
+  } else if (responseTime > expectedResponseTime) {
+    message = `The server at ${url} took ${responseTime}ms to respond, which is longer than the expected ${expectedResponseTime}ms.`
   }
 
-  const responseTime = Date.now() - start
-
-  if (responseTime > expectedResponseTime) {
-    sendErrorToDiscord(
-      `The server at ${url} took ${responseTime}ms to respond, which is longer than the expected ${expectedResponseTime}ms.`
-    )
+  if (message) {
+    try {
+      await sendErrorToDiscord(message)
+    } catch {
+      core.setFailed(message)
+    }
   }
 }
 
@@ -109937,12 +109918,11 @@ async function ping() {
  * @param {string} error
  */
 async function sendErrorToDiscord(error) {
-  const url = core.getInput('discord-webhook-url')
+  const url = core.getInput('discord-webhook')
 
   // If the URL is not set, fail the action to prevent silent failures
   if (!url) {
-    core.setFailed(error)
-    return
+    throw new Error('Discord webhook URL not set')
   }
 
   const webhookClient = new WebhookClient({ url })
@@ -109952,7 +109932,7 @@ async function sendErrorToDiscord(error) {
   embed.setColor(0xda3633)
   embed.setDescription(error)
 
-  webhookClient.send({
+  await webhookClient.send({
     embeds: [embed]
   })
 }

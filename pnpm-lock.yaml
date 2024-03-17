@@ -25,6 +25,9 @@ devDependencies:
   '@babel/preset-env':
     specifier: ^7.24.0
     version: 7.24.0(@babel/core@7.24.0)
+  '@types/jest':
+    specifier: ^29.5.12
+    version: 29.5.12
   '@vercel/ncc':
     specifier: ^0.38.1
     version: 0.38.1
@@ -2459,6 +2462,16 @@ packages:
       }
     dependencies:
       '@types/istanbul-lib-report': 3.0.3
+    dev: true
+
+  /@types/jest@29.5.12:
+    resolution:
+      {
+        integrity: sha512-eDC8bTvT/QhYdxJAulQikueigY5AsdBRH2yDKW3yveW7svY3+DzN84/2NUgkw10RTiJbWqZrTtoGVdYlvFJdLw==
+      }
+    dependencies:
+      expect: 29.7.0
+      pretty-format: 29.7.0
     dev: true
 
   /@types/json-schema@7.0.15:
