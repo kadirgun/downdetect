@@ -35,12 +35,11 @@ jobs:
 
 ## Inputs
 
-| Input                     | Default | Description                                                 |
-| ------------------------- | ------- | ----------------------------------------------------------- |
-| `expected-status-codes`   | 200     | The status code that the website is expected to return.     |
-| `unexpected-status-codes` |         | The status code that the website is not expected to return. |
-| `expected-response-time`  | 3000    | The expected response time in milliseconds.                 |
-| `discord-webhook`         |         | The Discord webhook URL to send notifications to.           |
+| Input                    | Default | Description                                             |
+| ------------------------ | ------- | ------------------------------------------------------- |
+| `expected-status-codes`  | 200     | The status code that the website is expected to return. |
+| `expected-response-time` | 3000    | The expected response time in milliseconds.             |
+| `discord-webhook`        |         | The Discord webhook URL to send notifications to.       |
 
 ## Outputs
 
