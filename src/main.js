@@ -46,7 +46,7 @@ async function ping() {
   const start = Date.now()
   const response = await fetch(url)
   if (!expectedStatusCodes.includes(response.status)) {
-    sendErrorToDiscord(
+    return sendErrorToDiscord(
       `The server at ${url} returned a status code of ${response.status}.`
     )
   }
@@ -54,10 +54,13 @@ async function ping() {
   const responseTime = Date.now() - start
 
   if (responseTime > expectedResponseTime) {
-    sendErrorToDiscord(
+    return sendErrorToDiscord(
       `The server at ${url} took ${responseTime}ms to respond, which is longer than the expected ${expectedResponseTime}ms.`
     )
   }
+
+  core.setOutput('response-time', responseTime)
+  core.setOutput('status-code', response.status)
 }
 
 /**
@@ -80,9 +83,14 @@ async function sendErrorToDiscord(error) {
   embed.setColor(0xda3633)
   embed.setDescription(error)
 
-  webhookClient.send({
-    embeds: [embed]
-  })
+  try {
+    await webhookClient.send({
+      embeds: [embed]
+    })
+  } catch {
+    // If the message fails to send, fail the action to prevent silent failures
+    core.setFailed(error)
+  }
 }
 
 module.exports = {
